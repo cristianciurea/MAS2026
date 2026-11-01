@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">ISM_2026</string>
+    <string name="my_first_label">My first label</string>
+    <string name="date">Date:</string>
+    <string name="eur">EUR:</string>
+    <string name="usd">USD:</string>
+    <string name="gbp">GBP:</string>
+    <string name="xau">XAU:</string>
+    <string name="display_fx_rates">Display FX rates</string>
+    <string name="save_fx_rates">Save FX rates</string>
+    <string name="send_encrypted_sms">Send encrypted SMS</string>
+    <string name="view_local_database">View local database</string>
+    <string name="view_firebase">View Firebase</string>
+    <string name="about">About</string>
+</resources>
