@@ -12,4 +12,6 @@
     <string name="view_local_database">View local database</string>
     <string name="view_firebase">View Firebase</string>
     <string name="about">About</string>
+    <string name="message_to_encrypt">Message to encrypt</string>
+    <string name="phone_number">Phone number</string>
 </resources>

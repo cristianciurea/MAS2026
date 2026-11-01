@@ -1,6 +1,22 @@
 package ro.ase.ism_2026;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "fxrates")
 public class FXRate {
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @PrimaryKey(autoGenerate = true)
+    private int id;
 
     private String date;
     private String euro;
@@ -8,6 +24,18 @@ public class FXRate {
     private String pound;
     private String gold;
 
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    @Ignore
+    private String uid;
+
+    @Ignore
     public FXRate(){}
 
     public FXRate(String date, String euro, String dolar, String pound, String gold) {

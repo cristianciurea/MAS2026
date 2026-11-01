@@ -1,5 +1,7 @@
 package ro.ase.ism_2026;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,12 +16,22 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -109,6 +121,46 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Log.e("lifecycle", "Call method onCreate");
+
+        Button btnSave = findViewById(R.id.btnSave);
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int position = spinnerLocations.getSelectedItemPosition();
+
+                FXRate fxRate = new FXRate(tvDate.getText().toString(),
+                        etEUR.getText().toString(), etUSD.getText().toString(),
+                        etGBP.getText().toString(), etXAU.getText().toString());
+
+                if(position==0)
+                {
+                    try {
+                        writeToFile("file.dat", fxRate);
+                        fxRate=null;
+                        fxRate = readFromFile("file.dat");
+                        Toast.makeText(getApplicationContext(),
+                                fxRate.toString(), Toast.LENGTH_LONG).show();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                else
+                    if(position==1)
+                    {
+                        FXRatesDB database = FXRatesDB.getInstance(getApplicationContext());
+                        database.getFXRatesDao().insert(fxRate);
+                        Toast.makeText(getApplicationContext(),
+                                "Saved into database!", Toast.LENGTH_LONG).show();
+                    }
+                    else
+                        if(position==2)
+                        {
+                            writeFXRateInFirebase(fxRate);
+                            Toast.makeText(getApplicationContext(),
+                                    "Saved into Firebase!", Toast.LENGTH_LONG).show();
+                        }
+            }
+        });
     }
 
     @Override
@@ -159,7 +211,8 @@ public class MainActivity extends AppCompatActivity {
 
         if(item.getItemId()==R.id.option1)
         {
-            //TO DO
+            Intent intent = new Intent(this, SendSMSActivity.class);
+            startActivity(intent);
             return true;
         }
         else
@@ -245,5 +298,54 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
         return cv;
+    }
+
+    private void writeToFile(String fileName, FXRate fxRate)
+            throws IOException
+    {
+        FileOutputStream fileOutputStream = openFileOutput(fileName, Activity.MODE_PRIVATE);
+        DataOutputStream dos = new DataOutputStream(fileOutputStream);
+        dos.writeUTF(fxRate.getDate());
+        dos.writeUTF(fxRate.getEuro());
+        dos.writeUTF(fxRate.getDolar());
+        dos.writeUTF(fxRate.getPound());
+        dos.writeUTF(fxRate.getGold());
+        dos.flush();
+        fileOutputStream.close();
+    }
+
+    private FXRate readFromFile(String fileName)
+            throws IOException
+    {
+        FileInputStream fileInputStream = openFileInput(fileName);
+        DataInputStream dis = new DataInputStream(fileInputStream);
+        String date = dis.readUTF();
+        String euro = dis.readUTF();
+        String dolar = dis.readUTF();
+        String pound = dis.readUTF();
+        String gold = dis.readUTF();
+        FXRate fxRate = new FXRate(date, euro, dolar, pound, gold);
+        fileInputStream.close();
+        return fxRate;
+    }
+
+    private void writeFXRateInFirebase(FXRate fxRate)
+    {
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = firebaseDatabase.getReference("ism2026-default-rtdb");
+
+        myRef.child("ism2026-default-rtdb").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                fxRate.setUid(myRef.child("ism2026-default-rtdb").push().getKey());
+                myRef.child("ism2026-default-rtdb").child(fxRate.getUid()).setValue(fxRate);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

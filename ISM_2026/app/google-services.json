@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1328972564",
+    "firebase_url": "https://ism2026-default-rtdb.firebaseio.com",
+    "project_id": "ism2026",
+    "storage_bucket": "ism2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1328972564:android:ee14a0202b31ba76153801",
+        "android_client_info": {
+          "package_name": "ro.ase.ism_2026"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCOnFcR6-VsXTII5nY_Xm6dpd-jpCCFks"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
